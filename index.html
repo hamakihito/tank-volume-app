@@ -2,12 +2,43 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>タンク容量計算</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sanitize.css" />
   <style>
-    body { font-family: sans-serif; padding: 2em; }
-    label { display: block; margin-top: 1em; }
-    input, select { padding: 0.5em; font-size: 1em; }
-    .output { margin-top: 1em; font-size: 1.2em; color: darkgreen; }
+    body {
+      font-family: sans-serif;
+      margin: 1em;
+      padding: 1em;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    h1 {
+      font-size: 1.5em;
+      margin-bottom: 1em;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 1em;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.75em;
+      font-size: 1em;
+      box-sizing: border-box;
+    }
+
+    .output {
+      margin-top: 1.5em;
+      font-size: 1.3em;
+      text-align: center;
+      color: darkgreen;
+    }
   </style>
   <script src="t1_data_embed_full.js"></script>
 </head>
@@ -23,7 +54,7 @@
 
   <label>
     深さ（mm）:
-    <input type="number" id="depthInput" min="0" step="1" />
+    <input type="number" id="depthInput" min="0" step="1" placeholder="深さを入力" />
   </label>
 
   <div class="output">
@@ -39,11 +70,9 @@
       const data = tankData[tankNo];
       if (!data) return null;
 
-      // 完全一致を探す
       const exact = data.find(d => d.depth === depth);
       if (exact) return exact.volume;
 
-      // 補間（近い下限と上限の間で線形補間）
       const lower = [...data].reverse().find(d => d.depth < depth);
       const upper = data.find(d => d.depth > depth);
       if (lower && upper) {
@@ -51,7 +80,7 @@
         return Math.round(lower.volume + ratio * (upper.volume - lower.volume));
       }
 
-      return null; // 範囲外
+      return null;
     }
 
     function updateVolume() {

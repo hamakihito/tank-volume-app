@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const ratio = (numericValue - current[key]) / (next[key] - current[key]);
           const otherKey = key === 'depth' ? 'volume' : 'depth';
           const interpolated = current[otherKey] + ratio * (next[otherKey] - current[otherKey]);
-          return interpolated.toFixed(1);
+          return interpolated;
         }
       }
   
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         suppressInputEvent = true;
         volumeInput.value = interpolated;
         suppressInputEvent = false;
-        result.textContent = `タンク${tankNo}：深さ ${depth} mm → 容量 ${interpolated} ℓ`;
+        result.textContent = `タンク${tankNo}：深さ ${depth} mm → 容量 ${Math.round(interpolated)} ℓ`;
       } else {
         result.textContent = '';
       }
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         suppressInputEvent = true;
         depthInput.value = interpolated;
         suppressInputEvent = false;
-        result.textContent = `タンク${tankNo}：容量 ${volume} ℓ → 深さ ${interpolated} mm`;
+        result.textContent = `タンク${tankNo}：容量 ${volume} ℓ → 深さ ${Math.round(interpolated)} mm`;
       } else {
         result.textContent = '';
       }

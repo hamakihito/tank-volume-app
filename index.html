@@ -1,77 +1,82 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>タンク容量計算ツール（T1）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>タンク容量計算機</title>
+  <script src="tank_data.js"></script>
   <style>
     body {
-      font-family: sans-serif;
-      padding: 1em;
-      max-width: 500px;
-      margin: auto;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 1rem;
+      font-family: Arial, sans-serif;
+      line-height: 1.5;
     }
-    label {
-      display: block;
-      margin-top: 1em;
+    label, input, button {
+      font-size: 1.2rem;
     }
-    input {
+    input, button {
       width: 100%;
-      padding: 0.5em;
-      font-size: 1em;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      box-sizing: border-box;
     }
-    .result {
-      margin-top: 1em;
+    button {
+      cursor: pointer;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #result {
+      margin-top: 1rem;
+      font-size: 1.3rem;
       font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>タンク T1 容量ツール</h1>
+  <h1>深さから容量を計算</h1>
+  <label for="depthInput">深さ (cm): </label>
+  <input type="number" id="depthInput" placeholder="深さを入力してください" />
+  <button onclick="calculateVolume()">容量を計算</button>
 
-  <label for="depthInput">液面までの深さ（cm）:</label>
-  <input type="number" id="depthInput" step="0.1" placeholder="例: 100" />
+  <p id="result"></p>
 
-  <label for="capacityInput">容量（L）:</label>
-  <input type="number" id="capacityInput" step="0.1" placeholder="例: 2500" />
-
-  <p class="result" id="output"></p>
-
-  <script src="t1_data_embed_full.js"></script>
   <script>
-    const depthInput = document.getElementById("depthInput");
-    const capacityInput = document.getElementById("capacityInput");
-    const output = document.getElementById("output");
-
-    function updateFromDepth() {
-      const depth = parseFloat(depthInput.value);
-      if (isNaN(depth)) {
-        output.textContent = "";
-        return;
+    function interpolate(data, depth) {
+      for (let i = 0; i < data.length - 1; i++) {
+        const p1 = data[i];
+        const p2 = data[i + 1];
+        if (depth >= p1.depth && depth <= p2.depth) {
+          const ratio = (depth - p1.depth) / (p2.depth - p1.depth);
+          return p1.volume + ratio * (p2.volume - p1.volume);
+        }
       }
-      capacityInput.value = "";
-      const closest = tankData["T1"].reduce((prev, curr) => 
-        Math.abs(curr.depth - depth) < Math.abs(prev.depth - depth) ? curr : prev
-      );
-      output.textContent = `容量は ${closest.capacity} L です`;
+      return undefined;
     }
 
-    function updateFromCapacity() {
-      const capacity = parseFloat(capacityInput.value);
-      if (isNaN(capacity)) {
-        output.textContent = "";
+    function calculateVolume() {
+      const depth = parseFloat(document.getElementById("depthInput").value);
+      const data = tankData["T1"];
+      const volume = interpolate(data, depth);
+      const result = document.getElementById("result");
+
+      if (!depth && depth !== 0) {
+        result.innerText = "深さを正しく入力してください。";
         return;
       }
-      depthInput.value = "";
-      const closest = tankData["T1"].reduce((prev, curr) => 
-        Math.abs(curr.capacity - capacity) < Math.abs(prev.capacity - capacity) ? curr : prev
-      );
-      output.textContent = `液面までの深さは ${closest.depth} cm です`;
-    }
 
-    depthInput.addEventListener("input", updateFromDepth);
-    capacityInput.addEventListener("input", updateFromCapacity);
+      if (volume !== undefined) {
+        result.innerText = `深さ ${depth} cm の容量は約 ${volume.toFixed(2)} L です。`;
+      } else {
+        result.innerText = "指定された深さはデータ範囲外です。";
+      }
+    }
   </script>
 </body>
 </html>

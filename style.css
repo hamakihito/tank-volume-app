@@ -1,97 +1,89 @@
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: 'Segoe UI', sans-serif;
   margin: 0;
-  padding: 0;
-  background-color: #f5f5f5;
+  background: #f4f4f4;
 }
 
 .container {
   max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
+  margin: auto;
+  padding: 1rem;
 }
 
 header {
   text-align: center;
-  margin-bottom: 20px;
-}
-
-.logo {
-  width: 80px;
-  height: auto;
-  margin-bottom: 10px;
+  margin-bottom: 1.5rem;
 }
 
 h1 {
-  font-size: 1.6em;
-  color: #333;
+  font-size: 1.6rem;
+  margin: 0.5rem 0;
 }
 
 .card {
-  background-color: #fff;
-  padding: 20px;
+  background: white;
+  padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 label {
   display: block;
-  margin-top: 15px;
+  margin-top: 1rem;
   font-weight: bold;
-  color: #444;
-  font-size: 0.95em;
 }
 
-input[type="text"],
-input[type="number"] {
+input[type="number"],
+input[list] {
   width: 100%;
-  padding: 12px;
-  font-size: 1em;
-  margin-top: 5px;
-  margin-bottom: 10px;
+  padding: 0.6rem;
+  margin-top: 0.5rem;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: 8px;
+  font-size: 1rem;
   box-sizing: border-box;
 }
 
 #result {
-  margin-top: 20px;
-  padding: 12px;
-  background-color: #eef;
-  border: 1px solid #99c;
-  border-radius: 6px;
-  font-size: 1em;
+  margin-top: 1.5rem;
+  font-size: 1.2rem;
+  font-weight: bold;
   color: #333;
-  text-align: center;
 }
 
-/* オートコンプリート候補リスト */
 #tankSuggestions {
-  position: absolute;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  width: calc(100% - 40px);
-  max-height: 180px;
-  overflow-y: auto;
-  margin-top: -5px;
-  border-radius: 0 0 6px 6px;
-  z-index: 1000;
-  display: none;
   list-style: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  box-sizing: border-box;
-  padding-left: 0;
+  margin: 0;
+  padding: 0;
 }
 
 #tankSuggestions li {
-  padding: 10px;
+  padding: 0.3rem;
   cursor: pointer;
-  font-size: 0.95em;
-  border-bottom: 1px solid #eee;
 }
 
 #tankSuggestions li:hover {
-  background-color: #f0f0f0;
+  background: #eee;
 }
 
-/* モバイル対応レスポンシブ*
+/* スマホ対応 */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+}
+
+/* ロゴを右下に小さく固定表示 */
+.logo {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  width: 60px;
+  height: auto;
+  opacity: 0.8;
+  z-index: 100;
+}

@@ -2,9 +2,38 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>タンク容量計算アプリ</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* サジェスト候補のスタイル */
+    #tankSuggestions {
+      border: 1px solid #ccc;
+      max-height: 150px;
+      overflow-y: auto;
+      position: absolute;
+      background: white;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: none;
+      z-index: 1000;
+    }
+
+    #tankSuggestions li {
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+
+    #tankSuggestions li:hover {
+      background-color: #eee;
+    }
+
+    .input-container {
+      position: relative;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -15,8 +44,10 @@
 
     <div class="card">
       <label for="tankSelect">タンク番号</label>
-      <input list="tankList" id="tankSelect" placeholder="例: 1" />
-      <datalist id="tankList"></datalist>
+      <div class="input-container">
+        <input type="text" id="tankSelect" placeholder="例: 1" autocomplete="off" />
+        <ul id="tankSuggestions"></ul>
+      </div>
 
       <label for="depthInput">液面までの深さ (mm)</label>
       <input type="number" id="depthInput" placeholder="例: 150" />

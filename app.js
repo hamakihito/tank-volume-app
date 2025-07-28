@@ -8,7 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let suppressInputEvent = false;
   
     // タンクデータ読み込み（グローバル変数 tankData を使用）
-    const getTankData = (tankNo) => tankData[tankNo] || [];
+    const getTankData = (tankNo) => {
+        console.log('getTankData called with tankNo:', tankNo);
+        console.log('tankData:', tankData);
+        return tankData[tankNo] || [];
+      };
   
     const findNearestValue = (data, key, value) => {
       if (!data.length) return null;

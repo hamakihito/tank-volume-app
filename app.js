@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 200);
     });
   
-    // ⬇️ メインロジック：タンクと深さから容量を計算
+    // ⬇️ メインロジック：タンクと液面までの深さから容量を計算
     tankSelect.addEventListener('change', () => {
       const tankNo = tankSelect.value.trim();
       const data = tankData[tankNo];
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
       depthInput.addEventListener('input', () => {
         const depth = parseFloat(depthInput.value);
         if (isNaN(depth)) {
-          resultDiv.textContent = '有効な深さを入力してください。';
+          resultDiv.textContent = '有効な液面までの深さを入力してください。';
           return;
         }
   
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
             volumeInput.value = interpolatedVolume.toFixed(2);
             resultDiv.textContent = `容量（推定）: ${interpolatedVolume.toFixed(2)} L`;
           } else {
-            resultDiv.textContent = '深さがデータ範囲外です。';
+            resultDiv.textContent = '液面までの深さがデータ範囲外です。';
             volumeInput.value = '';
           }
         }
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
         if (matched) {
           depthInput.value = matched.depth;
-          resultDiv.textContent = `深さ: ${matched.depth} mm`;
+          resultDiv.textContent = `液面までの深さ: ${matched.depth} mm`;
         } else {
           // 線形補間
           const lower = [...data].reverse().find(d => d.volume < volume);
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 (volume - lower.volume);
   
             depthInput.value = interpolatedDepth.toFixed(2);
-            resultDiv.textContent = `深さ（推定）: ${interpolatedDepth.toFixed(2)} mm`;
+            resultDiv.textContent = `液面までの深さ（推定）: ${interpolatedDepth.toFixed(2)} mm`;
           } else {
             resultDiv.textContent = '容量がデータ範囲外です。';
             depthInput.value = '';

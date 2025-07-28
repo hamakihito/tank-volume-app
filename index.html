@@ -1,82 +1,129 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>タンク容量計算機</title>
-  <script src="tank_data.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>タンク容量計算アプリ</title>
   <style>
     body {
-      max-width: 600px;
+      font-family: sans-serif;
+      margin: 1rem;
+    }
+    .container {
+      max-width: 500px;
       margin: 0 auto;
-      padding: 1rem;
-      font-family: Arial, sans-serif;
-      line-height: 1.5;
     }
-    label, input, button {
-      font-size: 1.2rem;
-    }
-    input, button {
-      width: 100%;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-      box-sizing: border-box;
-    }
-    button {
-      cursor: pointer;
-      background-color: #007bff;
-      border: none;
-      color: white;
-      border-radius: 4px;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    #result {
+    label {
+      display: block;
       margin-top: 1rem;
-      font-size: 1.3rem;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.3rem;
+      font-size: 1rem;
+    }
+    .result {
+      margin-top: 1.5rem;
+      font-size: 1.2rem;
       font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 0.5rem;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>深さから容量を計算</h1>
-  <label for="depthInput">深さ (cm): </label>
-  <input type="number" id="depthInput" placeholder="深さを入力してください" />
-  <button onclick="calculateVolume()">容量を計算</button>
+  <div class="container">
+    <h2>タンク容量計算</h2>
 
-  <p id="result"></p>
+    <label for="tankSelect">タンクNoを選択</label>
+    <select id="tankSelect"></select>
+
+    <label for="depthInput">液面までの深さ（cm）</label>
+    <input type="number" id="depthInput" placeholder="深さを入力">
+
+    <label for="volumeInput">容量（L）</label>
+    <input type="number" id="volumeInput" placeholder="容量を入力">
+
+    <div class="result" id="resultArea"></div>
+  </div>
 
   <script>
-    function interpolate(data, depth) {
-      for (let i = 0; i < data.length - 1; i++) {
-        const p1 = data[i];
-        const p2 = data[i + 1];
-        if (depth >= p1.depth && depth <= p2.depth) {
-          const ratio = (depth - p1.depth) / (p2.depth - p1.depth);
-          return p1.volume + ratio * (p2.volume - p1.volume);
+    let tankData = {};
+
+    // HTML要素参照
+    const tankSelect = document.getElementById('tankSelect');
+    const depthInput = document.getElementById('depthInput');
+    const volumeInput = document.getElementById('volumeInput');
+    const resultArea = document.getElementById('resultArea');
+
+    // JSON読み込み
+    fetch('tank_data.json')
+      .then(res => res.json())
+      .then(data => {
+        tankData = data;
+        populateTankSelect(Object.keys(data));
+      });
+
+    // タンクセレクトの選択肢を作成
+    function populateTankSelect(tankNos) {
+      tankNos.forEach(tankNo => {
+        const option = document.createElement('option');
+        option.value = tankNo;
+        option.textContent = `タンク ${tankNo}`;
+        tankSelect.appendChild(option);
+      });
+    }
+
+    // 線形補間
+    function interpolate(x, data, keyX, keyY) {
+      const sorted = [...data].sort((a, b) => parseFloat(a[keyX]) - parseFloat(b[keyX]));
+      for (let i = 0; i < sorted.length - 1; i++) {
+        const x1 = parseFloat(sorted[i][keyX]);
+        const x2 = parseFloat(sorted[i + 1][keyX]);
+        const y1 = parseFloat(sorted[i][keyY]);
+        const y2 = parseFloat(sorted[i + 1][keyY]);
+
+        if (x >= x1 && x <= x2) {
+          const ratio = (x - x1) / (x2 - x1);
+          return y1 + (y2 - y1) * ratio;
         }
       }
-      return undefined;
+      return null;
     }
 
-    function calculateVolume() {
-      const depth = parseFloat(document.getElementById("depthInput").value);
-      const data = tankData["T1"];
-      const volume = interpolate(data, depth);
-      const result = document.getElementById("result");
-
-      if (!depth && depth !== 0) {
-        result.innerText = "深さを正しく入力してください。";
-        return;
-      }
-
-      if (volume !== undefined) {
-        result.innerText = `深さ ${depth} cm の容量は約 ${volume.toFixed(2)} L です。`;
+    // 入力変更イベント
+    depthInput.addEventListener('input', () => {
+      volumeInput.value = '';
+      const depth = parseFloat(depthInput.value);
+      const tankNo = tankSelect.value;
+      if (tankData[tankNo] && !isNaN(depth)) {
+        const volume = interpolate(depth, tankData[tankNo], 'depth', 'volume');
+        resultArea.textContent = volume !== null
+          ? `推定容量: ${volume.toFixed(2)} L`
+          : '深さが範囲外です';
       } else {
-        result.innerText = "指定された深さはデータ範囲外です。";
+        resultArea.textContent = '';
       }
-    }
+    });
+
+    volumeInput.addEventListener('input', () => {
+      depthInput.value = '';
+      const volume = parseFloat(volumeInput.value);
+      const tankNo = tankSelect.value;
+      if (tankData[tankNo] && !isNaN(volume)) {
+        const depth = interpolate(volume, tankData[tankNo], 'volume', 'depth');
+        resultArea.textContent = depth !== null
+          ? `推定深さ: ${depth.toFixed(2)} cm`
+          : '容量が範囲外です';
+      } else {
+        resultArea.textContent = '';
+      }
+    });
   </script>
 </body>
 </html>

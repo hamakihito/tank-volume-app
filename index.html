@@ -14,7 +14,8 @@
 
     <div class="card">
       <label for="tankSelect">タンク番号（直接入力 or 選択）</label>
-      <input list="tankList" id="tankSelect" placeholder="例: 1" autocomplete="off" />
+      <input list="tankList" id="tankSelect" placeholder="例: 1" inputmode="numeric" pattern="[0-9]*" />
+
       <datalist id="tankList"></datalist>
       <ul id="tankSuggestions"></ul>
 

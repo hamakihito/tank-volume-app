@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const tankSelect = document.getElementById('tankSelect');
+    const tankList = document.getElementById('tankList');
     const depthInput = document.getElementById('depthInput');
     const volumeInput = document.getElementById('volumeInput');
     const result = document.getElementById('result');
@@ -7,17 +8,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // 入力中のフラグを使って入力イベントの相互干渉を防止
     let suppressInputEvent = false;
   
-    // タンクデータ読み込み（グローバル変数 tankData を使用）
-    const getTankData = (tankNo) => {
-        console.log('getTankData called with tankNo:', tankNo);
-        console.log('tankData:', tankData);
-        return tankData[tankNo] || [];
-      };
+    // tankData のタンク番号を datalist に追加
+    Object.keys(tankData).forEach(tankNo => {
+      const option = document.createElement('option');
+      option.value = tankNo;
+      tankList.appendChild(option);
+    });
+  
+    // タンクデータ取得関数
+    const getTankData = (tankNo) => tankData[tankNo] || [];
   
     const findNearestValue = (data, key, value) => {
       if (!data.length) return null;
   
-      // 数値に変換して検索
       const numericValue = parseFloat(value);
       const sorted = data.slice().sort((a, b) => a[key] - b[key]);
   
@@ -32,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
   
-      // 範囲外の時は最も近い値
       const closest = sorted.reduce((prev, curr) =>
         Math.abs(curr[key] - numericValue) < Math.abs(prev[key] - numericValue) ? curr : prev
       );
@@ -49,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (depth && data.length > 0) {
         const interpolated = findNearestValue(data, 'depth', depth);
         suppressInputEvent = true;
-        volumeInput.value = interpolated;
+        volumeInput.value = Math.round(interpolated);
         suppressInputEvent = false;
         result.textContent = `タンク${tankNo}：深さ ${depth} mm → 容量 ${Math.round(interpolated)} ℓ`;
       } else {
@@ -65,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (volume && data.length > 0) {
         const interpolated = findNearestValue(data, 'volume', volume);
         suppressInputEvent = true;
-        depthInput.value = interpolated;
+        depthInput.value = Math.round(interpolated);
         suppressInputEvent = false;
         result.textContent = `タンク${tankNo}：容量 ${volume} ℓ → 深さ ${Math.round(interpolated)} mm`;
       } else {
@@ -86,11 +88,14 @@ document.addEventListener('DOMContentLoaded', () => {
       updateFromVolume();
     });
   
-    tankSelect.addEventListener('change', () => {
+    tankSelect.addEventListener('input', () => {
+      // 入力（手入力含む）が変わったら深さか容量どちらかあれば計算更新
       if (depthInput.value) {
         updateFromDepth();
       } else if (volumeInput.value) {
         updateFromVolume();
+      } else {
+        result.textContent = '';
       }
     });
   });

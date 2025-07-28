@@ -3,146 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>タンク容量変換アプリ</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 1em;
-      background: #f5f5f5;
-    }
-
-    .container {
-      max-width: 500px;
-      margin: auto;
-      background: white;
-      padding: 1.5em;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    label {
-      display: block;
-      margin-top: 1em;
-      font-weight: bold;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 0.6em;
-      margin-top: 0.5em;
-      font-size: 1em;
-    }
-
-    .result {
-      margin-top: 1.5em;
-      font-size: 1.2em;
-      font-weight: bold;
-      color: #333;
-    }
-
-    @media screen and (max-width: 600px) {
-      .container {
-        padding: 1em;
-      }
-    }
-  </style>
+  <title>タンク容量計算アプリ</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h2>タンク容量変換アプリ</h2>
+    <header>
+      <img src="logo.png" alt="会社ロゴ" class="logo" />
+      <h1>タンク容量計算アプリ</h1>
+    </header>
 
-    <label for="tankSelect">タンクNoを選択</label>
-    <select id="tankSelect"></select>
+    <div class="card">
+      <label for="tankSelect">タンク番号</label>
+      <input list="tankList" id="tankSelect" placeholder="例: 1" />
+      <datalist id="tankList"></datalist>
 
-    <label for="depthInput">液面までの深さ（mm）</label>
-    <input type="number" id="depthInput" placeholder="例: 1500" />
+      <label for="depthInput">液面までの深さ (mm)</label>
+      <input type="number" id="depthInput" placeholder="例: 150" />
 
-    <label for="volumeInput">容量（L）</label>
-    <input type="number" id="volumeInput" placeholder="例: 1200" />
+      <label for="volumeInput">容量 (L)</label>
+      <input type="number" id="volumeInput" placeholder="例: 1180" />
 
-    <div class="result" id="result"></div>
+      <div id="result"></div>
+    </div>
   </div>
 
-  <script>
-    let tankData = {};
-
-    async function loadData() {
-      const response = await fetch('tank_data.json');
-      tankData = await response.json();
-
-      const tankSelect = document.getElementById('tankSelect');
-      Object.keys(tankData).forEach(tankNo => {
-        const option = document.createElement('option');
-        option.value = tankNo;
-        option.textContent = `タンク ${tankNo}`;
-        tankSelect.appendChild(option);
-      });
-
-      updateDisplay();
-    }
-
-    function interpolate(value, dataList, keyIn, keyOut) {
-      value = parseFloat(value);
-      for (let i = 0; i < dataList.length - 1; i++) {
-        const x1 = parseFloat(dataList[i][keyIn]);
-        const x2 = parseFloat(dataList[i + 1][keyIn]);
-        const y1 = parseFloat(dataList[i][keyOut]);
-        const y2 = parseFloat(dataList[i + 1][keyOut]);
-
-        if (value >= x1 && value <= x2) {
-          const ratio = (value - x1) / (x2 - x1);
-          return y1 + ratio * (y2 - y1);
-        }
-      }
-      return null;
-    }
-
-    function updateDisplay() {
-      const tankNo = document.getElementById('tankSelect').value;
-      const depthInput = document.getElementById('depthInput');
-      const volumeInput = document.getElementById('volumeInput');
-      const result = document.getElementById('result');
-
-      const data = tankData[tankNo];
-
-      const depthMm = depthInput.value ? parseFloat(depthInput.value) : null;
-      const volume = volumeInput.value ? parseFloat(volumeInput.value) : null;
-
-      let output = "";
-
-      if (depthMm && !volumeInput.value) {
-        const depthCm = depthMm / 10;
-        const interpolatedVolume = interpolate(depthCm, data, "depth", "volume");
-        if (interpolatedVolume !== null) {
-          output = `容量: ${interpolatedVolume.toFixed(1)} L`;
-          volumeInput.value = "";
-        } else {
-          output = "深さがデータ範囲外です。";
-        }
-      } else if (volume && !depthInput.value) {
-        const interpolatedDepth = interpolate(volume, data, "volume", "depth");
-        if (interpolatedDepth !== null) {
-          output = `液面までの深さ: ${(interpolatedDepth * 10).toFixed(1)} mm`;
-          depthInput.value = "";
-        } else {
-          output = "容量がデータ範囲外です。";
-        }
-      }
-
-      result.textContent = output;
-    }
-
-    document.getElementById('tankSelect').addEventListener('change', updateDisplay);
-    document.getElementById('depthInput').addEventListener('input', () => {
-      document.getElementById('volumeInput').value = "";
-      updateDisplay();
-    });
-    document.getElementById('volumeInput').addEventListener('input', () => {
-      document.getElementById('depthInput').value = "";
-      updateDisplay();
-    });
-
-    loadData();
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>

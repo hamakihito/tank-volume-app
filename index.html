@@ -5,60 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>タンク容量計算アプリ</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    /* サジェスト候補のスタイル */
-    #tankSuggestions {
-      border: 1px solid #ccc;
-      max-height: 150px;
-      overflow-y: auto;
-      position: absolute;
-      background: white;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      display: none;
-      z-index: 1000;
-    }
-
-    #tankSuggestions li {
-      padding: 6px 10px;
-      cursor: pointer;
-    }
-
-    #tankSuggestions li:hover {
-      background-color: #eee;
-    }
-
-    .input-container {
-      position: relative;
-    }
-  </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <img src="logo.png" alt="会社ロゴ" class="logo" />
+      <img src="logo.png" alt="ロゴ" class="logo" />
       <h1>タンク容量計算アプリ</h1>
     </header>
 
     <div class="card">
-      <label for="tankSelect">タンク番号</label>
-      <div class="input-container">
-        <input type="text" id="tankSelect" placeholder="例: 1" autocomplete="off" />
-        <ul id="tankSuggestions"></ul>
-      </div>
+      <label for="tankSelect">タンク番号（直接入力 or 選択）</label>
+      <input list="tankList" id="tankSelect" placeholder="例: 1" autocomplete="off" />
+      <datalist id="tankList"></datalist>
+      <ul id="tankSuggestions"></ul>
 
-      <label for="depthInput">液面までの深さ (mm)</label>
-      <input type="number" id="depthInput" placeholder="例: 150" />
+      <label for="depthInput">深さ (mm)</label>
+      <input type="number" id="depthInput" placeholder="例: 500" />
 
       <label for="volumeInput">容量 (L)</label>
-      <input type="number" id="volumeInput" placeholder="例: 1180" />
+      <input type="number" id="volumeInput" placeholder="例: 200" />
 
       <div id="result"></div>
     </div>
   </div>
 
+  <!-- スクリプト -->
   <script src="tank_data.js"></script>
   <script src="app.js"></script>
 </body>

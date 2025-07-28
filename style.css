@@ -87,3 +87,12 @@ input[list] {
   opacity: 0.8;
   z-index: 100;
 }
+
+.logo-inside-card {
+  display: block;
+  width: 50px;
+  margin-left: auto;
+  margin-top: -1.5rem;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}

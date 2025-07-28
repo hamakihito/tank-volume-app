@@ -2,129 +2,76 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>タンク容量計算ツール</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>タンク容量計算ツール（T1）</title>
   <style>
     body {
       font-family: sans-serif;
-      padding: 1rem;
-      max-width: 600px;
+      padding: 1em;
+      max-width: 500px;
       margin: auto;
     }
     label {
       display: block;
-      margin-top: 1rem;
+      margin-top: 1em;
     }
-    input, select {
+    input {
       width: 100%;
-      padding: 0.5rem;
-      font-size: 1rem;
-      margin-top: 0.25rem;
+      padding: 0.5em;
+      font-size: 1em;
     }
-    p {
-      margin-top: 0.5rem;
+    .result {
+      margin-top: 1em;
       font-weight: bold;
-    }
-    @media screen and (max-width: 600px) {
-      body {
-        font-size: 1rem;
-        padding: 0.5rem;
-      }
     }
   </style>
 </head>
 <body>
-  <h1>タンク容量計算ツール</h1>
-
-  <label for="tankSelect">タンクNo.:</label>
-  <select id="tankSelect">
-    <option value="T1">T1</option>
-  </select>
+  <h1>タンク T1 容量ツール</h1>
 
   <label for="depthInput">液面までの深さ（cm）:</label>
-  <input type="number" id="depthInput" step="0.1" placeholder="例: 120.5" />
-  <p id="capacityResult"></p>
+  <input type="number" id="depthInput" step="0.1" placeholder="例: 100" />
 
   <label for="capacityInput">容量（L）:</label>
   <input type="number" id="capacityInput" step="0.1" placeholder="例: 2500" />
-  <p id="depthResult"></p>
 
+  <p class="result" id="output"></p>
+
+  <script src="t1_data_embed_full.js"></script>
   <script>
-    const tankData = {
-      "T1": [
-        { "depth": 0, "capacity": 0 },
-        { "depth": 10, "capacity": 100 },
-        { "depth": 20, "capacity": 210 },
-        { "depth": 30, "capacity": 320 },
-        { "depth": 40, "capacity": 430 },
-        { "depth": 50, "capacity": 540 },
-        { "depth": 60, "capacity": 650 },
-        { "depth": 70, "capacity": 760 },
-        { "depth": 80, "capacity": 870 },
-        { "depth": 90, "capacity": 980 },
-        { "depth": 100, "capacity": 1090 }
-      ]
-    };
-
     const depthInput = document.getElementById("depthInput");
     const capacityInput = document.getElementById("capacityInput");
-    const capacityResult = document.getElementById("capacityResult");
-    const depthResult = document.getElementById("depthResult");
+    const output = document.getElementById("output");
 
-    depthInput.addEventListener("input", function () {
-      const selectedTank = document.getElementById("tankSelect").value;
-      const data = tankData[selectedTank];
-      const inputDepth = parseFloat(depthInput.value);
-
+    function updateFromDepth() {
+      const depth = parseFloat(depthInput.value);
+      if (isNaN(depth)) {
+        output.textContent = "";
+        return;
+      }
       capacityInput.value = "";
-      depthResult.textContent = "";
+      const closest = tankData["T1"].reduce((prev, curr) => 
+        Math.abs(curr.depth - depth) < Math.abs(prev.depth - depth) ? curr : prev
+      );
+      output.textContent = `容量は ${closest.capacity} L です`;
+    }
 
-      if (isNaN(inputDepth) || !data) {
-        capacityResult.textContent = "";
+    function updateFromCapacity() {
+      const capacity = parseFloat(capacityInput.value);
+      if (isNaN(capacity)) {
+        output.textContent = "";
         return;
       }
-
-      let closest = data[0];
-      let minDiff = Math.abs(data[0].depth - inputDepth);
-
-      for (let i = 1; i < data.length; i++) {
-        const diff = Math.abs(data[i].depth - inputDepth);
-        if (diff < minDiff) {
-          closest = data[i];
-          minDiff = diff;
-        }
-      }
-
-      capacityResult.textContent = `容量は約 ${closest.capacity} L です`;
-    });
-
-    capacityInput.addEventListener("input", function () {
-      const selectedTank = document.getElementById("tankSelect").value;
-      const data = tankData[selectedTank];
-      const inputCap = parseFloat(capacityInput.value);
-
       depthInput.value = "";
-      capacityResult.textContent = "";
+      const closest = tankData["T1"].reduce((prev, curr) => 
+        Math.abs(curr.capacity - capacity) < Math.abs(prev.capacity - capacity) ? curr : prev
+      );
+      output.textContent = `液面までの深さは ${closest.depth} cm です`;
+    }
 
-      if (isNaN(inputCap) || !data) {
-        depthResult.textContent = "";
-        return;
-      }
-
-      let closest = data[0];
-      let minDiff = Math.abs(data[0].capacity - inputCap);
-
-      for (let i = 1; i < data.length; i++) {
-        const diff = Math.abs(data[i].capacity - inputCap);
-        if (diff < minDiff) {
-          closest = data[i];
-          minDiff = diff;
-        }
-      }
-
-      depthResult.textContent = `推定される液面までの深さは約 ${closest.depth} cm です`;
-    });
+    depthInput.addEventListener("input", updateFromDepth);
+    capacityInput.addEventListener("input", updateFromCapacity);
   </script>
 </body>
 </html>
